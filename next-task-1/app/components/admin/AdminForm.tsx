@@ -9,6 +9,7 @@ import {
   AdminCreateInput,
 } from '@/app/lib/validators/admin';
 import { api } from '@/app/lib/axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function AdminForm({ onCreated }: { onCreated: () => void }) {
   const {
@@ -24,15 +25,21 @@ export default function AdminForm({ onCreated }: { onCreated: () => void }) {
     try {
       await api.post('/admin/register', data);
       setMsg('✅ Admin created');
+      toast.success('Admin created successfully');
       reset();
       onCreated();
     } catch (e: any) {
-      setMsg(e?.response?.data?.message || 'Failed to create admin');
+      const errText = e?.response?.data?.message || 'Failed to create admin';
+      setMsg(errText);
+      toast.error(errText);
     }
   };
 
   return (
     <div className="p-4 rounded-xl bg-white shadow">
+      {/* One global Toaster is fine; leaving it here makes this change self-contained */}
+      <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />
+
       <h2 className="font-semibold mb-3">Create Admin (POST)</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
         <input
