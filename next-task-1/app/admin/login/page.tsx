@@ -5,28 +5,29 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/app/lib/axios';
 import AdminForm from '@/app/components/admin/AdminForm';
+import toast, { Toaster } from 'react-hot-toast';
 
 type LoginForm = { email: string; password: string };
 
 export default function AdminLoginPage() {
   const { register, handleSubmit } = useForm<LoginForm>();
-  const [err, setErr] = useState<string | null>(null);
   const [seedOpen, setSeedOpen] = useState(false);
-  const [seedMsg, setSeedMsg] = useState<string | null>(null);
   const router = useRouter();
 
   const onSubmit = async (data: LoginForm) => {
-    setErr(null);
     try {
       await api.post('/admin/login', data);
+      toast.success('✅ Login successful! Redirecting...');
       router.replace('/admin/dashboard');
     } catch (e: any) {
-      setErr(e?.response?.data?.message || 'Invalid credentials');
+      toast.error(e?.response?.data?.message || '❌ Invalid credentials');
     }
   };
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
+      <Toaster position="top-right" />
+
       {/* Login card */}
       <div className="bg-white shadow p-6 rounded-xl">
         <h1 className="text-xl font-semibold mb-4">Admin Login (POST)</h1>
@@ -44,19 +45,18 @@ export default function AdminLoginPage() {
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
             Login
           </button>
         </form>
-        {err && <div className="text-red-600 mt-2">{err}</div>}
       </div>
 
       {/* Create-first-admin helper */}
       <div className="bg-white shadow p-4 rounded-xl">
         <button
           onClick={() => setSeedOpen(v => !v)}
-          className="w-full text-left px-3 py-2 rounded bg-gray-100"
+          className="w-full text-left px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 transition"
         >
           {seedOpen ? '▾' : '▸'} Create first admin (if you can’t log in)
         </button>
@@ -69,12 +69,11 @@ export default function AdminLoginPage() {
             </p>
             <AdminForm
               onCreated={() => {
-                setSeedMsg(
+                toast.success(
                   '✅ Admin created. Now log in with those credentials.'
                 );
               }}
             />
-            {seedMsg && <div className="text-sm mt-2">{seedMsg}</div>}
           </div>
         )}
       </div>
