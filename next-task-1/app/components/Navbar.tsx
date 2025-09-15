@@ -8,7 +8,7 @@ export default function Navbar() {
         <img
           src="/logo.png"
           alt="EventHub"
-          className="h-8 w-8 object-contain"
+          className="h-9 w-9 object-contain"
         />
         <span className="font-bold text-xl">EventHub</span>
       </div>
